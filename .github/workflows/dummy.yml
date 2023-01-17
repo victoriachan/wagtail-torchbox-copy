@@ -1,0 +1,11 @@
+name: dummy_flightpath
+run-name: Dummy run by @${{ github.actor }}
+on: [workflow_dispatch]
+jobs:
+  run_dummy_flightpath:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Dummy hello
+        run: |
+          echo Hello, world!
