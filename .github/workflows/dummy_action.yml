@@ -1,3 +1,10 @@
 name: dummy_action_stub
 run-name: Dummy action by @${{ github.actor }}
 on: [workflow_dispatch]
+jobs:
+  run_dummy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Dummy hello
+      - run: echo Hello, world!
