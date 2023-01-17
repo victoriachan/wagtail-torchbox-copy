@@ -1,0 +1,3 @@
+name: dummy_action_stub
+run-name: Dummy action by @${{ github.actor }}
+on: [workflow_dispatch]
