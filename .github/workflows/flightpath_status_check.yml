@@ -3,12 +3,13 @@ name: flightpath_status_check
 #   - FLIGHTPATH_URL (URL for the flightpath excluding trailing slash)
 #   - FLIGHTPATH_AUTH_KEY (from flightpath)
 run-name: Check status of flightpath job by @${{ github.actor }}
-on: [workflow_dispatch]
-  inputs:
-    job_id:
-      description: 'Flightpath job id'
-      required: true
-      type: string
+on:
+  workflow_dispatch:
+    inputs:
+      job_id:
+        description: 'Flightpath job id'
+        required: true
+        type: string
 jobs:
   run_flightpath_status_check:
     runs-on: ubuntu-latest
