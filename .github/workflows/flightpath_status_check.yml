@@ -1,13 +1,13 @@
-name: flightpath_status_check
+name: Flight path status check
 # The following secrets are required on GitHub:
 #   - FLIGHTPATH_URL (URL for the flightpath excluding trailing slash)
 #   - FLIGHTPATH_AUTH_KEY (from flightpath)
-run-name: Check status of flightpath job by @${{ github.actor }}
+run-name: Check status of flight path job ${{inputs.job_id}} by @${{ github.actor }}
 on:
   workflow_dispatch:
     inputs:
       job_id:
-        description: 'Flightpath job id'
+        description: 'Flightpath job id. Get this by inspecting the output from run_flightpath.py when running "Copy prod to staging" Github Action.'
         required: true
         type: string
 jobs:
