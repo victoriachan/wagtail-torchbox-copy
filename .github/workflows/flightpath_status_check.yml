@@ -1,8 +1,8 @@
-name: check_copy_prod_to_staging_status
+name: flightpath_status_check
 # The following secrets are required on GitHub:
 #   - FLIGHTPATH_URL (URL for the flightpath excluding trailing slash)
 #   - FLIGHTPATH_AUTH_KEY (from flightpath)
-run-name: Check status of production to staging by @${{ github.actor }}
+run-name: Check status of flightpath job by @${{ github.actor }}
 on: [workflow_dispatch]
   inputs:
     job_id:
