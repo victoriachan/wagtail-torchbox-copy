@@ -4,12 +4,11 @@ name: check_copy_prod_to_staging_status
 #   - FLIGHTPATH_AUTH_KEY (from flightpath)
 run-name: Check status of production to staging by @${{ github.actor }}
 on: [workflow_dispatch]
-inputs:
-  job_id:
-    description: 'Flightpath job id'
-    required: true
-    type: string
-concurrency: staging_environment
+  inputs:
+    job_id:
+      description: 'Flightpath job id'
+      required: true
+      type: string
 jobs:
   run_flightpath_status_check:
     runs-on: ubuntu-latest
