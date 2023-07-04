@@ -95,10 +95,10 @@
         }
 
         #{$root}__container {
-            padding: 0 8.33vw;
+            padding: 230px 8.33vw 0;
 
             @include media-query(large) {
-                padding: 0 0 0 8.33vw;
+                padding: 230px 0 0 8.33vw;
             }
         }
 
@@ -115,10 +115,12 @@
             @include media-query(large) {
                 padding-right: 45vw;
                 padding-top: ($gutter * 3);
+                min-height: 415px; // to ensure image doesn't overlap hero area if text is shorter
             }
         }
     }
 
+    // The following code for image & image-mask is only used on proposition pages currently
     &__image {
         display: block;
         margin-top: -25px;
@@ -126,10 +128,11 @@
     }
 
     &__image-mask {
-        @include z-index(header); // above in page nav to allow for overlap
+        @include z-index(zero);
         display: none;
         position: absolute;
-        top: -60px;
+        max-height: 500px;
+        top: 140px;
         right: -50px;
         width: 45vw;
         height: auto;
@@ -218,6 +221,22 @@
 
         p {
             color: var(--color--primary);
+        }
+
+        a {
+            color: var(--color--theme-link);
+            font-weight: $weight--heavy;
+            border-bottom: 2px solid transparent; // prevent layout shift
+            transition: border $transition-quick;
+
+            &:hover {
+                border-bottom: 2px solid var(--color--accent);
+                color: var(--color--theme-hover);
+
+                .theme--coral & {
+                    border-bottom: 2px solid var(--color--white);
+                }
+            }
         }
     }
 }

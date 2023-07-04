@@ -1,3 +1,4 @@
-<div>
-    {{ value }}
+{% load wagtailmarkdown %}
+<div class="streamfield__markdown markdown-block">
+    {{ value|markdown }}
 </div>

@@ -71,6 +71,7 @@
 @import 'components/shards';
 @import 'components/skip-link';
 @import 'components/streamfield';
+@import 'components/sprites-preview-icons';
 @import 'components/subnav';
 @import 'components/tag';
 @import 'components/team';
@@ -83,3 +84,6 @@
 @import 'components/values';
 @import 'components/utilities';
 @import 'components/webstory-player';
+
+// CSS from external vendors
+@import 'vendor/codehilite';

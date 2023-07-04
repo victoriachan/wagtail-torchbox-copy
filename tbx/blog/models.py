@@ -10,9 +10,8 @@ from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
 
 from bs4 import BeautifulSoup
-
 from modelcluster.fields import ParentalKey, ParentalManyToManyField
-from tbx.core.blocks import StoryBlock
+from tbx.core.blocks import PageSectionStoryBlock, StoryBlock
 from tbx.core.models import RelatedLink, Tag
 from tbx.core.utils.cache import get_default_cache_control_decorator
 from tbx.taxonomy.models import Service
@@ -35,6 +34,12 @@ class BlogIndexPage(Page):
     subpage_types = ["BlogPage"]
 
     intro = models.TextField(blank=True)
+    call_to_action = StreamField(
+        PageSectionStoryBlock(),
+        blank=True,
+        use_json_field=True,
+        collapsed=True,
+    )
 
     search_fields = Page.search_fields + [
         index.SearchField("intro"),
@@ -125,9 +130,9 @@ class BlogIndexPage(Page):
     def serve_preview(self, request, mode_name):
         return self.serve(request)
 
-    content_panels = [
-        FieldPanel("title", classname="title"),
+    content_panels = Page.content_panels + [
         FieldPanel("intro"),
+        FieldPanel("call_to_action"),
         InlinePanel("related_links", label="Related links"),
     ]
 
@@ -182,6 +187,12 @@ class BlogPage(Page):
     canonical_url = models.URLField(blank=True, max_length=255)
     related_services = ParentalManyToManyField(
         "taxonomy.Service", related_name="blog_posts"
+    )
+    call_to_action = StreamField(
+        PageSectionStoryBlock(),
+        blank=True,
+        use_json_field=True,
+        collapsed=True,
     )
 
     search_fields = Page.search_fields + [
@@ -264,11 +275,11 @@ class BlogPage(Page):
     def type(self):
         return "BLOG POST"
 
-    content_panels = [
-        FieldPanel("title", classname="title"),
+    content_panels = Page.content_panels + [
         InlinePanel("authors", label="Author", min_num=1),
         FieldPanel("date"),
         FieldPanel("body"),
+        FieldPanel("call_to_action"),
         InlinePanel("related_links", label="Related links"),
     ]
 

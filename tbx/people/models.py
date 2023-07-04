@@ -4,11 +4,11 @@ from django.db import models
 from django.dispatch import receiver
 from django.utils.functional import cached_property
 
-from phonenumber_field.modelfields import PhoneNumberField
-
 from modelcluster.fields import ParentalKey
 from modelcluster.models import ClusterableModel
+from phonenumber_field.modelfields import PhoneNumberField
 from tbx.blog.models import BlogIndexPage, BlogPage
+from tbx.core.blocks import PageSectionStoryBlock
 from tbx.people.blocks import InstagramEmbedBlock, StandoutItemsBlock
 from tbx.people.forms import ContactForm
 from tbx.work.models import WorkIndexPage, WorkPage
@@ -37,19 +37,25 @@ class PersonPage(Page):
         on_delete=models.SET_NULL,
         related_name="+",
     )
+    call_to_action = StreamField(
+        PageSectionStoryBlock(),
+        blank=True,
+        use_json_field=True,
+        collapsed=True,
+    )
 
     search_fields = Page.search_fields + [
         index.SearchField("intro"),
         index.SearchField("biography"),
     ]
 
-    content_panels = [
-        FieldPanel("title", classname="title"),
+    content_panels = Page.content_panels + [
         FieldPanel("role"),
         FieldPanel("is_senior"),
         FieldPanel("intro"),
         FieldPanel("biography"),
         FieldPanel("image"),
+        FieldPanel("call_to_action"),
     ]
 
     promote_panels = [
@@ -94,6 +100,13 @@ class PersonPage(Page):
 # Person index
 class PersonIndexPage(Page):
     strapline = models.CharField(max_length=255)
+    call_to_action = StreamField(
+        PageSectionStoryBlock(),
+        blank=True,
+        use_json_field=True,
+        collapsed=True,
+    )
+
     template = "patterns/pages/team/team_listing.html"
 
     subpage_types = ["PersonPage"]
@@ -104,6 +117,7 @@ class PersonIndexPage(Page):
 
     content_panels = Page.content_panels + [
         FieldPanel("strapline"),
+        FieldPanel("call_to_action"),
     ]
 
 
@@ -162,8 +176,7 @@ class CulturePage(Page):
         use_json_field=True,
     )
 
-    content_panels = [
-        FieldPanel("title", classname="title"),
+    content_panels = Page.content_panels + [
         FieldPanel("strapline"),
         FieldPanel("hero_image"),
         FieldPanel("intro"),
@@ -227,6 +240,10 @@ class CulturePage(Page):
         )
         return context
 
+    @property
+    def filter_by(self):
+        return "culture"
+
 
 class BaseCulturePageKeyPoint(models.Model):
     text = models.CharField(max_length=255)
@@ -268,8 +285,7 @@ class ValuesPage(Page):
         use_json_field=True,
     )
 
-    content_panels = [
-        FieldPanel("title", classname="title"),
+    content_panels = Page.content_panels + [
         FieldPanel("strapline"),
         FieldPanel("intro"),
         InlinePanel("values", heading="Values", label="Values"),
@@ -415,7 +431,7 @@ class Contact(index.Indexed, models.Model):
         related_name="+",
     )
     email_address = models.EmailField()
-    phone_number = PhoneNumberField()
+    phone_number = PhoneNumberField(blank=True, null=True)
     default_contact = models.BooleanField(default=False, blank=True, null=True)
     base_form_class = ContactForm
 

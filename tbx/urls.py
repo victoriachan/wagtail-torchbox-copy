@@ -15,9 +15,6 @@ from wagtail.documents import urls as wagtaildocs_urls
 from wagtail.models import Page
 from wagtail.utils.urlpatterns import decorate_urlpatterns
 
-# from wagtail_review import urls as wagtailreview_urls
-
-
 private_urlpatterns = [
     path("django-admin/", admin.site.urls),
     path("admin/", include(wagtailadmin_urls)),
@@ -53,7 +50,6 @@ if settings.DEBUG:
 
 
 urlpatterns += [
-    # path('review/', include(wagtailreview_urls)),
     path("", include(torchbox_urls)),
 ]
 

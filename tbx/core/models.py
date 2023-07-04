@@ -2,6 +2,7 @@ from django.db import models
 from django.shortcuts import render
 
 from modelcluster.fields import ParentalKey
+from tbx.core.blocks import PageSectionStoryBlock
 from wagtail import blocks
 from wagtail.admin.panels import (
     FieldPanel,
@@ -217,8 +218,7 @@ class HomePage(Page):
     class Meta:
         verbose_name = "Homepage"
 
-    content_panels = [
-        FieldPanel("title", classname="title"),
+    content_panels = Page.content_panels + [
         MultiFieldPanel(
             [
                 FieldPanel("hero_intro_primary"),
@@ -250,9 +250,17 @@ class StandardPage(Page):
     template = "patterns/pages/standard/standard_page.html"
 
     body = StreamField(StoryBlock(), use_json_field=True)
+    additional_content = StreamField(
+        PageSectionStoryBlock(),
+        blank=True,
+        use_json_field=True,
+        collapsed=True,
+        verbose_name="Call to action",
+    )
 
     content_panels = Page.content_panels + [
         FieldPanel("body"),
+        FieldPanel("additional_content"),
     ]
 
 

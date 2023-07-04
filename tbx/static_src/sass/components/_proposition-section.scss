@@ -31,5 +31,28 @@
         @include font-size(s);
         color: var(--color--grey-dark);
         max-width: 760px;
+
+        a {
+            cursor: pointer;
+            font-weight: $weight--heavy;
+            color: var(--color--link);
+            border-bottom: 2px solid transparent; // prevent layout shift
+
+            &:hover {
+                border-bottom: 2px solid var(--color--accent);
+                color: var(--color--link);
+            }
+        }
+    }
+
+    .streamfield {
+        margin: 0;
+        &:first-of-type {
+            margin-top: ($gutter * 3);
+
+            @include media-query(large) {
+                margin-top: ($gutter * 6);
+            }
+        }
     }
 }

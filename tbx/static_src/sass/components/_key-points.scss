@@ -23,6 +23,16 @@
 
     &__link {
         @include link-slide-right(4px, -5px);
+        .streamfield & {
+            &:hover {
+                border-bottom: 0;
+            }
+        }
+
+        &::before {
+            //override underline colour in mixin
+            background-color: var(--color--accent);
+        }
     }
 
     &__intro {

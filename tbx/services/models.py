@@ -3,11 +3,13 @@ from django.utils.functional import cached_property
 
 from modelcluster.fields import ParentalKey
 from tbx.blog.models import BlogIndexPage
+from tbx.core.blocks import PageSectionStoryBlock
 from tbx.propositions.models import PropositionPage
 from tbx.work.models import WorkIndexPage
 from wagtail.admin.panels import FieldPanel, InlinePanel, MultiFieldPanel
-from wagtail.fields import RichTextField
+from wagtail.fields import RichTextField, StreamField
 from wagtail.models import Orderable, Page
+from wagtail.search import index
 
 
 class BaseServicePage(Page):
@@ -58,11 +60,20 @@ class BaseServicePage(Page):
         blank=True,
         help_text="An opportunity to use a more flexible call to action, if the main “Contact” fields aren’t suitable",
     )
+    processes_section_embed_url = models.URLField("Embed URL", blank=True)
 
     # Section titles
     key_points_section_title = models.TextField(blank=True, default="Services")
-    testimonials_section_title = models.TextField(blank=True, default="Clients")
-    case_studies_section_title = models.TextField(blank=True, default="Work")
+    testimonials_section_title = models.TextField(
+        blank=True,
+        default="Clients",
+        help_text="Leave this field empty to hide the testimonials section.",
+    )
+    case_studies_section_title = models.TextField(
+        blank=True,
+        default="Work",
+        help_text="Leave this field empty to hide the case studies section.",
+    )
     blogs_section_title = models.TextField(blank=True, default="Thinking")
     process_section_title = models.TextField(blank=True, default="Process")
 
@@ -106,6 +117,7 @@ class BaseServicePage(Page):
                 FieldPanel("process_section_title"),
                 FieldPanel("heading_for_processes"),
                 FieldPanel("use_process_block_image"),
+                FieldPanel("processes_section_embed_url"),
                 InlinePanel("processes", label="Processes"),
                 FieldPanel("process_section_cta"),
             ],
@@ -169,6 +181,14 @@ class BaseServicePage(Page):
             for f in self.featured_case_studies.all()
             if f.case_study
         ]
+
+    @property
+    def filter_by(self):
+        if self.service:
+            return self.service.slug
+
+        # If no service defined, don't filter by anything
+        return ""
 
 
 class BaseServicePageKeyPoint(models.Model):
@@ -252,17 +272,26 @@ class BaseServicePageFeaturedBlogPost(models.Model):
 class BaseServicePageProcess(models.Model):
     title = models.TextField()
     description = models.TextField()
+    external_link = models.URLField("External link", blank=True)
     page_link = models.ForeignKey(
         "wagtailcore.Page", on_delete=models.CASCADE, blank=True, null=True
     )
-    page_link_label = models.TextField(blank=True, null=True)
+    link_label = models.TextField(blank=True, null=True)
 
     panels = [
         FieldPanel("title", classname="title"),
         FieldPanel("description", classname="title"),
         FieldPanel("page_link"),
-        FieldPanel("page_link_label"),
+        FieldPanel("external_link"),
+        FieldPanel("link_label"),
     ]
+
+    @property
+    def link(self):
+        if self.external_link:
+            return self.external_link
+        if self.page_link:
+            return self.page_link.get_url()
 
     class Meta:
         abstract = True
@@ -281,9 +310,16 @@ class ServicePage(BaseServicePage):
         blank=True,
         help_text="Link to this service in taxonomy",
     )
+    call_to_action = StreamField(
+        PageSectionStoryBlock(),
+        blank=True,
+        use_json_field=True,
+        collapsed=True,
+    )
 
     content_panels = BaseServicePage.content_panels.copy()
     content_panels.insert(1, FieldPanel("service"))
+    content_panels.append(FieldPanel("call_to_action"))
 
     subpage_types = ["SubServicePage"]
 
@@ -323,6 +359,18 @@ class SubServicePage(BaseServicePage):
     template = "patterns/pages/service/service.html"
 
     parent_page_types = ["ServicePage", "propositions.PropositionPage"]
+
+    content = StreamField(
+        PageSectionStoryBlock(), blank=True, use_json_field=True, collapsed=True
+    )
+
+    search_fields = BaseServicePage.search_fields + [
+        index.SearchField("content"),
+    ]
+
+    content_panels = BaseServicePage.content_panels + [
+        FieldPanel("content", heading="Content"),
+    ]
 
     @cached_property
     def service(self):
